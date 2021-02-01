@@ -93,6 +93,7 @@ typedef enum {
     WIFI_REASON_ASSOC_FAIL               = 203,
     WIFI_REASON_HANDSHAKE_TIMEOUT        = 204,
     WIFI_REASON_CONNECTION_FAIL          = 205,
+    WIFI_REASON_AP_TSF_RESET             = 206,
 } wifi_err_reason_t;
 
 typedef enum {
@@ -114,7 +115,7 @@ typedef struct {
 } wifi_active_scan_time_t;
 
 /** @brief Aggregate of active & passive scan time per channel */
-typedef union {
+typedef struct {
     wifi_active_scan_time_t active;  /**< active scan time per channel, units: millisecond. */
     uint32_t passive;                /**< passive scan time per channel, units: millisecond, values above 1500ms may
                                           cause station to disconnect from AP and are not recommended. */
@@ -214,8 +215,8 @@ typedef struct {
     uint8_t channel;            /**< Channel of ESP32 soft-AP */
     wifi_auth_mode_t authmode;  /**< Auth mode of ESP32 soft-AP. Do not support AUTH_WEP in soft-AP mode */
     uint8_t ssid_hidden;        /**< Broadcast SSID or not, default 0, broadcast the SSID */
-    uint8_t max_connection;     /**< Max number of stations allowed to connect in, default 4, max 4 */
-    uint16_t beacon_interval;   /**< Beacon interval, 100 ~ 60000 ms, default 100 ms */
+    uint8_t max_connection;     /**< Max number of stations allowed to connect in, default 4, max 10 */
+    uint16_t beacon_interval;   /**< Beacon interval which should be multiples of 100. Unit: TU(time unit, 1 TU = 1024 us). Range: 100 ~ 60000. Default value: 100 */
 } wifi_ap_config_t;
 
 /** @brief STA configuration settings for the ESP32 */
@@ -518,6 +519,12 @@ typedef struct {
         wifi_ht2040_coex_t ht2040_coex; /**< Configuration of STA's HT2040 coexist management */
     } data;                             /**< Configuration of ioctl command */
 } wifi_ioctl_config_t;
+
+#define WIFI_STATIS_BUFFER    (1<<0)
+#define WIFI_STATIS_RXTX      (1<<1)
+#define WIFI_STATIS_HW        (1<<2)
+#define WIFI_STATIS_DIAG      (1<<3)
+#define WIFI_STATIS_ALL       (-1)
 
 #ifdef __cplusplus
 }
